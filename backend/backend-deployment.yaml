@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: localhost:5000/dockerfile-backend
+        resources:
+          limits:
+            cpu: "1"
+            memory: "200Mi"
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+        ports:
+        - containerPort: 3000
+        env:
+        # Add your environment variables here
+        # - name: VARIABLE_NAME
+        #   value: variable_value
