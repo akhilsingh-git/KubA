@@ -16,28 +16,34 @@ jobs:
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD}}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
     - name: Build and push frontend image
       uses: docker/build-push-action@v2
       with:
         context: ./frontend
         push: true
-        tags: akill69/frontend:latest
+        tags: akill69/dockerfile-frontend:latest
 
     - name: Build and push backend image
       uses: docker/build-push-action@v2
       with:
         context: ./backend
         push: true
-        tags: akill69/backend:latest
+        tags: akill69/dockerfile-backend:latest
+
+    - name: Set up kubectl
+      run: |
+        mkdir -p $HOME/.kube
+        sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+        cp /home/ubuntu/kubeconfig.yaml kubeconfig.yaml
 
     - name: Update Kubernetes deployments
       env:
-        KUBECONFIG: /home/ubuntu/actions-runner/kubeconfig.yaml
+        KUBECONFIG: kubeconfig.yaml
       run: |
-        kubectl set image deployment/frontend frontend=your-dockerhub-username/frontend:latest
-        kubectl set image deployment/backend backend=your-dockerhub-username/backend:latest
+        kubectl set image deployment/frontend frontend=akill69/dockerfile-frontend:latest
+        kubectl set image deployment/backend backend=akill69/dockerfile-backend:latest
         kubectl rollout status deployment/frontend
         kubectl rollout status deployment/backend
-
