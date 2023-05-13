@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v2
+      with:
+        context: ./frontend
+        push: true
+        tags: akill69/frontend:latest
+
+    - name: Build and push backend image
+      uses: docker/build-push-action@v2
+      with:
+        context: ./backend
+        push: true
+        tags: akill69/backend:latest
+
+    - name: Update Kubernetes deployments
+      run: |
+        export KUBECONFIG=kubeconfig.yaml
+        kubectl set image deployment/frontend frontend=akill69/frontend:latest
+        kubectl set image deployment/backend backend=akill69/backend:latest
+        kubectl rollout status deployment/frontend
+        kubectl rollout status deployment/backend
