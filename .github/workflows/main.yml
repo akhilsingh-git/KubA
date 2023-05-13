@@ -33,9 +33,11 @@ jobs:
         tags: akill69/backend:latest
 
     - name: Update Kubernetes deployments
+      env:
+        KUBECONFIG: /home/ubuntu/actions-runner/kubeconfig.yaml
       run: |
-        export KUBECONFIG=kubeconfig.yaml
-        kubectl set image deployment/frontend frontend=akill69/frontend:latest
-        kubectl set image deployment/backend backend=akill69/backend:latest
+        kubectl set image deployment/frontend frontend=your-dockerhub-username/frontend:latest
+        kubectl set image deployment/backend backend=your-dockerhub-username/backend:latest
         kubectl rollout status deployment/frontend
         kubectl rollout status deployment/backend
+
