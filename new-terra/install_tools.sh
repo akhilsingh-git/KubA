@@ -52,7 +52,40 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 #kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/custom-resources.yaml
-kubectl taint nodes --all node-role.kubernetes.io/master-
+#kubectl taint nodes --all node-role.kubernetes.io/master-
 kubectl taint nodes --all  node-role.kubernetes.io/control-plane-
 #kubectl get nodes -o wide
+#sudo apt-get update
+#sudo apt-get remove docker docker-engine docker.io
+#sudo apt-get install docker.io
+#docker ––version
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo \
+"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+"$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+#sudo apt-get install docker-ce docker-ce-cli containerd.io
+#sudo systemctl enable docker
+#sudo systemctl start docker
+
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+sudo apt-get install apt-transport-https --yes
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+kubectl create namespace monitoring
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+helm install grafana grafana/grafana --namespace monitoring
+
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+kubectl expose svc prometheus-kube-prometheus-prometheus -n monitoring --type=NodePort --target-port=9090 --name=prometheus-kube-prometheus-prometheus-ext
+kubectl expose service grafana -n monitoring --type=NodePort --target-port=3000 --name=grafana-ext
 
