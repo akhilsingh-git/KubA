@@ -1,4 +1,4 @@
-# Zocket-Task
+# Task
 
 Devops Engineer Assignment
 
