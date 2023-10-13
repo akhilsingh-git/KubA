@@ -1,7 +1,5 @@
 # Task
 
-Devops Engineer Assignment
-
 Assignment Title: Kubernetes Deployment and Scaling Project
 
 Assignment Description:
@@ -56,5 +54,5 @@ Note: You are free to make any reasonable assumptions regarding the application 
 infrastructure, or any other necessary configurations.
 
 Note :
-Kindly use tools like terraform , prometheus and grafana
+Kindly use tools like terraform, prometheus and grafana
 Also Get it ready to deploy it on aws
